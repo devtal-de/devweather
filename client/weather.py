@@ -30,6 +30,7 @@ import time
 import struct
 import math
 import datetime
+import json
 
 VENDOR = 0x1941
 PRODUCT = 0x8021
@@ -165,18 +166,11 @@ dev.set_configuration()
 # Program starts the next round minute from now
 start_time=datetime.datetime.now()+datetime.timedelta(minutes=1)
 start_time=start_time.replace(second=0, microsecond=0)
-sampling_time=start_time
 print('Program started at ' + str(start_time))
 
 
 try:
     while True:
-        sampling_time = sampling_time + datetime.timedelta(minutes=period)
-        time.sleep(period)
-        # daily filenames
-        now = str(datetime.datetime.now())
-        filename='/home/pi/Desktop/Data/'+now[0:10]+'-Weather.csv'
-        file = open(filename,'a')
 
 ########### Read data
         # Get the first 32 Bytes of the fixed
@@ -248,23 +242,34 @@ try:
         previous_rain = total_rain;
 
 ############### Save data
-        print(str(datetime.datetime.now())+' Saving data')
-        file.write(str(datetime.datetime.now()))
-        file.write(',')
-        file.write('%i,' %indoor_humidity)
-        file.write('%i,' %outdoor_humidity)
-        file.write('%2.1f,' %indoor_temperature)
-        file.write('%2.1f,' %outdoor_temperature)
-        file.write('%2.2f,' %outdoor_dew_point)
-        file.write('%2.1f,' %wind_chill_temp)
-        file.write('%2.1f,' %wind_speed)
-        file.write('%2.1f,' %gust_speed)
-        file.write('%s,' %WIND_DIRS[wind_dir])
-        file.write('%2.1f,' %rain_diff)
-        file.write('%3.1f,' %total_rain)
-        file.write('%4.1f,' %abs_pressure)
-        file.write('\n')
-        file.close()
+        data = {}
+        data['time'] = str(datetime.datetime.now())
+        data['indoor_humidity'] = indoor_humidity
+        if outdoor_humidity != 255:
+            data['outdoor_humidity'] = round( outdoor_humidity )
+        data['indoor_temperature'] = round( indoor_temperature, 1)
+        if outdoor_temperature > -50:
+            data['outdoor_temperature'] = round( outdoor_temperature, 1 )
+        if outdoor_dew_point > -50:
+            data['outdoor_dew_point'] = round( outdoor_dew_point, 1)
+        if wind_chill_temp > -50:
+            data['wind_chill_temp'] = round( wind_chill_temp, 1 )
+        if wind_speed < 1000:
+            data['wind_speed'] = round( wind_speed, 1)
+        if gust_speed < 1000:
+            data['gust_speed'] = round( gust_speed, 1)
+        if wind_dir < 16:
+            print(wind_dir)
+            data['wind_dir'] = WIND_DIRS[wind_dir]
+        data['rain_diff'] = round( rain_diff, 1)
+        data['total_rain'] = round( total_rain, 1)
+        data['abs_pressure'] = round( abs_pressure, 1 )
+        print(json.dumps(data))
+
+        #print( data['time'] +' Saving data')
+
+        time.sleep(period)
+
 
 except (KeyboardInterrupt, SystemExit):
     print ('\n...Program Stopped Manually!')
