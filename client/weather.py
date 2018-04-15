@@ -1,15 +1,14 @@
-#!/usr/bin/env python
 # Model Dreamlink WH1080
-# https://github.com/shaneHowearth/Dream-Link-WH1080-Weather-Station/blob/master/weather.py
+#!/usr/bin/env python
 #
-# This is a python port of 
+# This is a python port of
 # http://www.sjcnet.id.au/wordpress/wp-content/plugins/download-monitor/download.php?id=5
 #
 # If running Ubuntu and getting permissions errors
 # Follow the advice given here http://ubuntuforums.org/showthread.php?t=901891
 #
 # I found the GROUPS portion was REQUIRED on one machine, set it to an appropriate group for
-# your system 
+# your system
 #
 # /etc/udev/rules.d/41-weather-device.rules
 #
@@ -31,7 +30,6 @@ import time
 import struct
 import math
 import datetime
-import pause
 
 VENDOR = 0x1941
 PRODUCT = 0x8021
@@ -40,9 +38,7 @@ WIND_DIRS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW',
 max_rain_jump = 10
 previous_rain = 0
 # interval for data collection
-period=1 # minutes
-# Only required for Weather Underground users
-wu_upload_file = "/tmp/wu-wupload.htx"
+period=5 # second
 
 
 def open_ws():
@@ -171,13 +167,12 @@ start_time=datetime.datetime.now()+datetime.timedelta(minutes=1)
 start_time=start_time.replace(second=0, microsecond=0)
 sampling_time=start_time
 print('Program started at ' + str(start_time))
-pause.until(start_time)
 
 
 try:
     while True:
         sampling_time = sampling_time + datetime.timedelta(minutes=period)
-        pause.until(sampling_time)
+        time.sleep(period)
         # daily filenames
         now = str(datetime.datetime.now())
         filename='/home/pi/Desktop/Data/'+now[0:10]+'-Weather.csv'
@@ -219,12 +214,12 @@ try:
         # Bytes 8 and 9 when combined create an unsigned short int
         # that we multiply by 0.1 to find the absolute pressure
         abs_pressure = struct.unpack('H', current_block[7:9])[0]*0.1
-        
+
         wind = current_block[9]
         gust = current_block[10]
         wind_extra = current_block[11]
         wind_dir = current_block[12]
-        
+
         # Bytes 14 and 15  when combined create an unsigned short int
         # that we multiply by 0.3 to find the total rain
         # I'm not confident that this is correct. Neither abs_pressure nor
