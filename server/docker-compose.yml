@@ -1,0 +1,25 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    image: exmatrikulator/devweather
+    volumes:
+      - config:/app/config
+      - migrations:/app/migrations
+      - .:/app
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+volumes:
+  config:
+  data:
+  migrations:

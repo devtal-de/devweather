@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }}
+
+{% endblock %} {% block content %}
+
+<h1>/dev/tal Wetter</h1>
+
+<a href="/data/{{ data.id-1 }}">vorherige Messung</a>
+<br><br>
+
+Daten von {{ data.time.strftime('%d.%m.%Y %H:%M') }}
+<br>
+
+<br>Luftfeuchtigkeit innen:
+{% if data.indoor_humidity is not none %}
+  {{ data.indoor_humidity }}
+{% endif %}
+
+<br>Luftfeuchtigkeit außen:
+{% if data.outdoor_humidity is not none %}
+  {{ data.outdoor_humidity }}
+{% endif %}
+
+<br>Temperatur innen:
+{% if data.indoor_temperature is not none %}
+  {{ data.indoor_temperature }} &deg;C
+{% endif %}
+
+<br>Temperatur außen:
+{% if data.outdoor_temperature is not none %}
+  {{ data.outdoor_temperature }} &deg;C
+{% endif %}
+
+{% if data.outdoor_dew_point is not none %}
+  {{ data.outdoor_dew_point }}
+{% endif %}
+
+{% if data.wind_chill_temp is not none %}
+  {{ data.wind_chill_temp }}
+{% endif %}
+
+<br>Windgeschwindigkeit:
+{% if data.wind_speed is not none %}
+  {{ data.wind_speed }}
+{% endif %}
+
+{% if data.gust_speed is not none %}
+  {{ data.gust_speed }}
+{% endif %}
+
+<br>Windrichtung:
+{% if data.wind_dir is not none %}
+  {{ data.wind_dir }}
+{% endif %}
+
+<br>Regen Unterschied:
+{% if data.rain_diff is not none %}
+  {{ data.rain_diff }}
+{% endif %}
+
+<br>Regen Gesamt:
+{% if data.total_rain is not none %}
+  {{ data.total_rain }}
+{% endif %}
+
+<br>Luftdruck:
+{% if data.abs_pressure is not none %}
+  {{ data.abs_pressure }}
+{% endif %}
+
+{% endblock %}
