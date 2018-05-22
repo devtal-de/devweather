@@ -31,6 +31,7 @@ import struct
 import math
 import datetime
 import json
+import requests
 
 VENDOR = 0x1941
 PRODUCT = 0x8021
@@ -39,7 +40,7 @@ WIND_DIRS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW',
 max_rain_jump = 10
 previous_rain = 0
 # interval for data collection
-period=5 # second
+period=300 # second
 
 
 def open_ws():
@@ -259,12 +260,14 @@ try:
         if gust_speed < 1000:
             data['gust_speed'] = round( gust_speed, 1)
         if wind_dir < 16:
-            print(wind_dir)
-            data['wind_dir'] = WIND_DIRS[wind_dir]
+            data['wind_dir'] = wind_dir
         data['rain_diff'] = round( rain_diff, 1)
         data['total_rain'] = round( total_rain, 1)
+        data['rain_plain1'] = current_block[13]
+        data['rain_plain2'] = current_block[14]
         data['abs_pressure'] = round( abs_pressure, 1 )
-        print(json.dumps(data))
+        r = requests.post('http://wetter.utopisten.eu/post', json=json.dumps(data))
+        r.status_code
 
         #print( data['time'] +' Saving data')
 
