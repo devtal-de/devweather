@@ -266,7 +266,9 @@ try:
         data['rain_plain1'] = current_block[13]
         data['rain_plain2'] = current_block[14]
         data['abs_pressure'] = round( abs_pressure, 1 )
-        r = requests.post('http://wetter.utopisten.eu/post', json=json.dumps(data))
+        headers = {"Content-Type": "application/json"}
+        r = requests.post('http://wetter.utopisten.eu/post', data=json.dumps(data), headers=headers)
+
         r.status_code
 
         #print( data['time'] +' Saving data')
